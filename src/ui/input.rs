@@ -1,4 +1,5 @@
 use std::io::{self, Write};
+use std::str::FromStr;
 
 pub fn read_input(message: &str) -> String {
     print!("{}", message);
@@ -13,24 +14,29 @@ pub fn read_input(message: &str) -> String {
     input.trim().to_string()
 }
 
-pub fn read_u32(message: &str) -> u32 {
+pub fn read_number<T, F>(message: &str, error: &str, accept: F) -> T
+where
+    T: FromStr,
+    F: Fn(&T) -> bool,
+{
     loop {
         let input = read_input(message);
 
-        match input.parse::<u32>() {
-            Ok(value) => return value,
-            Err(_) => println!("Please enter a valid number."),
+        match input.parse::<T>() {
+            Ok(value) if accept(&value) => return value,
+            _ => println!("{}", error),
         }
     }
 }
 
-pub fn read_f64(message: &str) -> f64 {
-    loop {
-        let input = read_input(message);
+pub fn read_u32(message: &str) -> u32 {
+    read_number(message, "Please enter a valid number.", |_| true)
+}
 
-        match input.parse::<f64>() {
-            Ok(value) if value >= 0.0 => return value,
-            _ => println!("Please enter a valid positive number."),
-        }
-    }
+pub fn read_f64(message: &str) -> f64 {
+    read_number(
+        message,
+        "Please enter a valid positive number.",
+        |value| *value >= 0.0,
+    )
 }

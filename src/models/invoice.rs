@@ -1,3 +1,4 @@
+use super::identifiable::Identifiable;
 use super::payment::Payment;
 
 #[derive(Debug)]
@@ -7,6 +8,12 @@ pub struct Invoice {
     pub amount: f64,
     pub paid: f64,
     pub payments: Vec<Payment>
+}
+
+impl Identifiable for Invoice {
+    fn id(&self) -> u32 {
+        self.id
+    }
 }
 
 pub enum InvoiceStatus {

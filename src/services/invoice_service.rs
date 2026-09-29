@@ -1,9 +1,8 @@
 use crate::models::invoice::Invoice;
 use crate::models::payment::Payment;
-use crate::ui::input::{
-    read_f64,
-    read_u32
-};
+use crate::services::find::{find_by_id, find_by_id_mut};
+use crate::ui::input::{read_f64, read_u32};
+
 pub fn add_invoice(invoices: &mut Vec<Invoice>,next_id: &mut u32,customer: String,amount: f64,) {
     let invoice = Invoice {
         id: *next_id,
@@ -16,26 +15,6 @@ pub fn add_invoice(invoices: &mut Vec<Invoice>,next_id: &mut u32,customer: Strin
     invoices.push(invoice);
 
     *next_id += 1;
-}
-
-pub fn find_invoice(invoices: &[Invoice], id: u32) -> Option<&Invoice> {
-    for invoice in invoices {
-        if invoice.id == id {
-            return Some(invoice);
-        }
-    }
-
-    None
-}
-
-pub fn find_invoice_mut(invoices: &mut [Invoice],id: u32,) -> Option<&mut Invoice> {
-    for invoice in invoices {
-        if invoice.id == id {
-            return Some(invoice);
-        }
-    }
-
-    None
 }
 
 pub fn list_invoices(invoices: &[Invoice]) {
@@ -67,7 +46,7 @@ pub fn show_invoice(invoices: &[Invoice]) {
 
     let id = read_u32("Invoice ID: ");
 
-    match find_invoice(invoices, id) {
+    match find_by_id(invoices, id) {
         Some(invoice) => invoice.display(),
         None => println!("Invoice not found."),
     }
@@ -79,7 +58,7 @@ pub fn record_payment(invoices: &mut [Invoice]) {
 
     let id = read_u32("Invoice ID: ");
 
-    let invoice = match find_invoice_mut(invoices, id) {
+    let invoice = match find_by_id_mut(invoices, id) {
         Some(invoice) => invoice,
         None => {
             println!("Invoice not found.");
@@ -135,7 +114,7 @@ pub fn invoice_payments(invoices: &[Invoice]) {
 
     let id = read_u32("Invoice ID: ");
 
-    let invoice = match find_invoice(invoices, id) {
+    let invoice = match find_by_id(invoices, id) {
         Some(invoice) => invoice,
         None => {
             println!("Invoice not found.");
