@@ -1,4 +1,5 @@
 use crate::models::invoice::Invoice;
+use crate::models::payment::Payment;
 use crate::ui::input::{
     read_f64,
     read_u32
@@ -9,6 +10,7 @@ pub fn add_invoice(invoices: &mut Vec<Invoice>,next_id: &mut u32,customer: Strin
         customer,
         amount,
         paid: 0.0,
+        payments: Vec::new(),
     };
 
     invoices.push(invoice);
@@ -47,12 +49,13 @@ pub fn list_invoices(invoices: &[Invoice]) {
 
     for invoice in invoices {
         println!(
-            "#{} | {} | Total: {:.2} | Paid: {:.2} | Remaining: {:.2}",
+            "#{} | {} | Total: {:.2} | Paid: {:.2} | Remaining: {:.2} | Payments: {}",
             invoice.id,
             invoice.customer,
             invoice.amount,
             invoice.paid,
-            invoice.remaining()
+            invoice.remaining(),
+            invoice.payment_count()
         );
     }
 }
@@ -110,10 +113,50 @@ pub fn record_payment(invoices: &mut [Invoice]) {
         return;
     }
 
+    let payment_id = invoice.payment_count() as u32 + 1;
+
+    invoice.payments.push(Payment {
+        id: payment_id,
+        amount: payment,
+        invoice_id: invoice.id,
+    });
     invoice.paid += payment;
 
     println!();
     println!("Payment recorded successfully.");
 
     invoice.display();
+}
+
+
+pub fn invoice_payments(invoices: &[Invoice]) {
+    println!();
+    println!("=== Invoice Payments ===");
+
+    let id = read_u32("Invoice ID: ");
+
+    let invoice = match find_invoice(invoices, id) {
+        Some(invoice) => invoice,
+        None => {
+            println!("Invoice not found.");
+            return;
+        }
+    };
+
+    println!();
+    println!("Invoice #{} | {}", invoice.id, invoice.customer);
+    println!("Payments: {}", invoice.payment_count());
+
+    if invoice.payments.is_empty() {
+        println!("No payments recorded.");
+        return;
+    }
+
+    for payment in &invoice.payments {
+        println!(
+            "Payment #{} | Amount: {:.2}",
+            payment.id,
+            payment.amount
+        );
+    }
 }

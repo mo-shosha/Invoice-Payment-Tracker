@@ -46,12 +46,16 @@ fn main() {
             }
 
             "5" => {
+                invoice_service::invoice_payments(&invoices);
+            }
+
+            "6" => {
                 println!("باى من غير سلام...........");
                 break;
             }
 
             _ => {
-                println!("Invalid option. Please choose from 1 to 5.");
+                println!("Invalid option. Please choose from 1 to 6.");
             }
         }
     }

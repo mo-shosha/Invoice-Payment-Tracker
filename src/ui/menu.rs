@@ -7,6 +7,7 @@ pub fn show_menu() {
     println!("2. List Invoices");
     println!("3. Record Payment");
     println!("4. Show Invoice");
-    println!("5. Exit");
+    println!("5. Invoice Payments");
+    println!("6. Exit");
     println!("=================================");
 }
