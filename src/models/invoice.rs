@@ -16,6 +16,7 @@ impl Identifiable for Invoice {
     }
 }
 
+#[derive(Debug, PartialEq)]
 pub enum InvoiceStatus {
     Unpaid,
     PartiallyPaid,
@@ -60,5 +61,48 @@ impl Invoice {
             InvoiceStatus::PartiallyPaid => println!("Status     : Partially Paid"),
             InvoiceStatus::Paid => println!("Status     : Paid"),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn invoice(paid: f64, payments: Vec<Payment>) -> Invoice {
+        Invoice {
+            id: 1001,
+            customer: "Ada".to_string(),
+            amount: 100.0,
+            paid,
+            payments,
+        }
+    }
+
+    #[test]
+    fn remaining_is_amount_minus_paid() {
+        let invoice = invoice(40.0, Vec::new());
+
+        assert_eq!(invoice.remaining(), 60.0);
+    }
+
+    #[test]
+    fn payment_count_matches_stored_payments() {
+        let invoice = invoice(
+            25.0,
+            vec![Payment {
+                id: 1,
+                amount: 25.0,
+                invoice_id: 1001,
+            }],
+        );
+
+        assert_eq!(invoice.payment_count(), 1);
+    }
+
+    #[test]
+    fn status_follows_how_much_is_paid() {
+        assert_eq!(invoice(0.0, Vec::new()).status(), InvoiceStatus::Unpaid);
+        assert_eq!(invoice(40.0, Vec::new()).status(), InvoiceStatus::PartiallyPaid);
+        assert_eq!(invoice(100.0, Vec::new()).status(), InvoiceStatus::Paid);
     }
 }
